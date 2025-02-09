@@ -6,13 +6,29 @@ export function effect(fn, options?) {
     _effect.run();
   });
   _effect.run();
-  return _effect;
+
+  if (options) {
+    Object.assign(_effect, options); // 使用options中的属性覆盖_effect中的属性
+  }
+  const runner = _effect.run.bind(_effect);
+  runner.effect = _effect;
+  return runner;
 }
 
 function preCleanUpEffect(effect) {
   effect._depsLength = 0;
   effect.trackId++; // 每次执行都会自增,如果当前同一个effect执行，id就是相同的
 }
+
+function postCleanUpEffect(effect) {
+  if (effect.deps.length > effect._depsLength) {
+    for (let i = effect._depsLength; i < effect.deps.length; i++) {
+      cleanDepEffect(effect.deps[i], effect);
+    }
+    effect.deps.length = effect._depsLength;
+  }
+}
+
 export let activeEffect;
 class ReactiveEffect {
   _trackId = 0; // 用于记录当前effect执行了几次
@@ -34,6 +50,7 @@ class ReactiveEffect {
 
       return this.fn(); // 收集依赖
     } finally {
+      postCleanUpEffect(this);
       activeEffect = lastEffect;
     }
   }
