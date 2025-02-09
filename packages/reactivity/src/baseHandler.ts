@@ -1,4 +1,5 @@
 import { activeEffect } from './effect';
+import { reactive } from './reactive';
 import { track, trigger } from './reactiveEffect';
 
 export enum ReactiveFlags {
@@ -11,7 +12,13 @@ export const mutavleHandlers: ProxyHandler<any> = {
     }
     console.log(activeEffect, key);
     track(target, key); // 收集这个对象的这个属性，和effect关联起来
-    return Reflect.get(target, key, recevier);
+
+    let result = Reflect.get(target, key, recevier);
+    if (typeof result === 'object') {
+      return reactive(result);
+    }
+
+    return result;
   },
   set(target, key, value, recevier) {
     // 触发更新

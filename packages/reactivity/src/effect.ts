@@ -34,6 +34,7 @@ class ReactiveEffect {
   _trackId = 0; // 用于记录当前effect执行了几次
   deps = [];
   _depsLength = 0;
+  _isRunning = 0;
 
   public active = true;
   constructor(public fn, public scheduler) {}
@@ -47,10 +48,11 @@ class ReactiveEffect {
 
       // 预先清理一下依赖
       preCleanUpEffect(this);
-
+      this._isRunning++;
       return this.fn(); // 收集依赖
     } finally {
       postCleanUpEffect(this);
+      this._isRunning--;
       activeEffect = lastEffect;
     }
   }
@@ -88,7 +90,9 @@ export function triggerEffects(dep) {
   for (let effect of dep.keys()) {
     // effect.run();
     if (effect.scheduler) {
-      effect.scheduler();
+      if (!effect._isRunning) {
+        effect.scheduler();
+      }
     }
   }
 }
