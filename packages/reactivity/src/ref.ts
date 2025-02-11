@@ -1,6 +1,6 @@
-import { activeEffect, trackEffect, triggerEffects } from './effect';
-import { toReactive } from './reactive';
-import { createDep } from './reactiveEffect';
+import { activeEffect, trackEffect, triggerEffects } from "./effect";
+import { toReactive } from "./reactive";
+import { createDep } from "./reactiveEffect";
 
 // ref  shallowRef
 export function ref(value) {
@@ -31,15 +31,15 @@ class RefImpl {
     }
   }
 }
-function trackRefValue(ref) {
+export function trackRefValue(ref) {
   if (activeEffect) {
     trackEffect(
       activeEffect,
-      (ref.dep = createDep(() => (ref.dep = undefined), 'value'))
+      (ref.dep = createDep(() => (ref.dep = undefined), "value"))
     );
   }
 }
-function triggerRefValue(ref) {
+export function triggerRefValue(ref) {
   let dep = ref.dep;
   if (dep) {
     triggerEffects(dep);

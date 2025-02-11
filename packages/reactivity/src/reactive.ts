@@ -1,5 +1,6 @@
-import { isObject } from '@vue/shared';
-import { mutavleHandlers, ReactiveFlags } from './baseHandler';
+import { isObject } from "@vue/shared";
+import { mutavleHandlers } from "./baseHandler";
+import { ReactiveFlags } from "./contants";
 const reactiveMap = new WeakMap(); // 用来存储对象和代理对象的映射关系
 
 function createReactiveObject(target) {
